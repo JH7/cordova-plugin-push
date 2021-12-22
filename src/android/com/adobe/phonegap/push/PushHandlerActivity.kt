@@ -46,9 +46,9 @@ class PushHandlerActivity : Activity() {
         notificationManager.cancel(FCMService.getAppName(this), notId)
       }
 
-      val inline = processPushBundle()
+      val hasInline = processPushBundle()
 
-      if (inline && Build.VERSION.SDK_INT < Build.VERSION_CODES.N && !startOnBackground) {
+      if (!hasInline && Build.VERSION.SDK_INT < Build.VERSION_CODES.N && !startOnBackground) {
         foreground = true
       }
 
@@ -63,7 +63,7 @@ class PushHandlerActivity : Activity() {
       if (!dismissed) {
         Log.d(TAG, "Is Push Plugin Active: ${PushPlugin.isActive}")
 
-        if (!PushPlugin.isActive && foreground && inline) {
+        if (!PushPlugin.isActive && foreground && !hasInline) {
           Log.d(TAG, "Force Main Activity Reload: Start on Background = False")
           forceMainActivityReload(false)
         } else if (startOnBackground) {
