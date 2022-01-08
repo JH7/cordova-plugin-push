@@ -214,6 +214,17 @@
         // [[NSNotificationCenter defaultCenter]
         //  addObserver:self selector:@selector(didDeleteMessagesOnServer)
         //  name:FIRMessagingMessagesDeletedNotification object:nil];
+      
+        id clearBadgeArg = [iosOptions objectForKey:@"clearBadge"];
+        if (clearBadgeArg == nil || ([clearBadgeArg isKindOfClass:[NSString class]] && [clearBadgeArg isEqualToString:@"false"]) || ![clearBadgeArg boolValue]) {
+            NSLog(@"PushPlugin.register: setting badge to false");
+            clearBadge = NO;
+        } else {
+            NSLog(@"PushPlugin.register: setting badge to true");
+            clearBadge = YES;
+            [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
+        }
+        NSLog(@"PushPlugin.register: clear badge is set to %d", clearBadge);
 
         [self.commandDelegate runInBackground:^ {
             NSLog(@"Push Plugin register called");
@@ -228,7 +239,6 @@
             id soundArg = [iosOptions objectForKey:@"sound"];
             id alertArg = [iosOptions objectForKey:@"alert"];
             id criticalArg = [iosOptions objectForKey:@"critical"];
-            id clearBadgeArg = [iosOptions objectForKey:@"clearBadge"];
 
             if (([badgeArg isKindOfClass:[NSString class]] && [badgeArg isEqualToString:@"true"]) || [badgeArg boolValue])
             {
@@ -252,16 +262,6 @@
                     authorizationOptions |= UNAuthorizationOptionCriticalAlert;
                 }
             }
-
-            if (clearBadgeArg == nil || ([clearBadgeArg isKindOfClass:[NSString class]] && [clearBadgeArg isEqualToString:@"false"]) || ![clearBadgeArg boolValue]) {
-                NSLog(@"PushPlugin.register: setting badge to false");
-                clearBadge = NO;
-            } else {
-                NSLog(@"PushPlugin.register: setting badge to true");
-                clearBadge = YES;
-                [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
-            }
-            NSLog(@"PushPlugin.register: clear badge is set to %d", clearBadge);
 
             isInline = NO;
 
@@ -413,9 +413,10 @@
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     __weak PushPlugin *weakSelf = self;
     [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
-
         if(![weakSelf usesFCM]) {
             [weakSelf registerWithToken: token];
+        } else {
+            [weakSelf initRegistration];
         }
     }];
 
