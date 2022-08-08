@@ -66,11 +66,9 @@ class PushHandlerActivity : Activity() {
         if (!PushPlugin.isActive && foreground && !hasInline) {
           Log.d(TAG, "Force Main Activity Reload: Start on Background = False")
           forceMainActivityReload(false)
-        } else if (startOnBackground) {
+        } else {
           Log.d(TAG, "Force Main Activity Reload: Start on Background = True")
           forceMainActivityReload(true)
-        } else {
-          Log.d(TAG, "Don't Want Main Activity")
         }
       }
     }
